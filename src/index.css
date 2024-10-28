@@ -1,0 +1,73 @@
+.table-container {
+  /* Remove center alignment */
+  display: block; /* Changed from flex */
+  width: 100%;
+  padding: 1rem;
+  max-width: 500px;
+  max-height: 400px;
+  overflow: auto;
+  position: relative;
+  border: 1px solid #ddd;
+  scroll-padding-left: 200px;
+}
+
+table {
+  width: 200%;
+  border-collapse: collapse;
+  margin: 0;
+  /* Ensure table starts from the left */
+  position: relative;
+  left: 0;
+}
+
+/* Make the header stick to the top while scrolling */
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #fff;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  min-width: 100px;
+  background-color: #fff; /* Ensure cell background is solid */
+}
+
+th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+td:focus,
+th:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+  background-color: #e9ecef;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Scrollbar styling */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
