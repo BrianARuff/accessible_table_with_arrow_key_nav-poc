@@ -1,6 +1,6 @@
 import { ReactNode, useId, useRef, KeyboardEvent, useState } from "react";
 
-export const Table = ({
+export const DataGrid = ({
   ariaReadOnly = "true",
   ariaRowCount = 0,
   ariaColumnCount = 0,
@@ -212,16 +212,18 @@ export const Table = ({
                   key={`table-tbody-tr-td-${rowIndex}-${colIndex}`}
                   tabIndex={-1}
                   aria-colindex={colIndex}
-                  scope={colIndex === 0 ? "row" : undefined}
-                  role={colIndex === 0 ? "rowheader" : "gridcell"}
-                  aria-readonly={colIndex === 0 ? "true" : undefined}
+                  // OPTIONALLY USE COMMENTED ITEMS IF COLUMN ONE IS THE ROW HEADER
+                  // scope={colIndex === 0 ? "row" : undefined}
+                  // role={colIndex === 0 ? "rowheader" : "gridcell"}
+                  // aria-readonly={colIndex === 0 ? "true" : undefined}
+                  // aria-labelledby={`table-tbody-tr-td-span-${uid}-${rowIndex}-${colIndex}`}
+                  // aria-describedby={
+                  //   rowIndex !== 0
+                  //     ? `table-thead-tr-th-${uid}-${colIndex} table-tbody-tr-td-${uid}-${rowIndex}-0`
+                  //     : `table-thead-tr-th-${uid}-${colIndex}`
+                  // }
+                  role="gridcell"
                   id={`table-tbody-tr-td-${uid}-${rowIndex}-${colIndex}`}
-                  aria-labelledby={`table-tbody-tr-td-span-${uid}-${rowIndex}-${colIndex}`}
-                  aria-describedby={
-                    rowIndex !== 0
-                      ? `table-thead-tr-th-${uid}-${rowIndex} table-tbody-tr-td-${uid}-${rowIndex}-0`
-                      : `table-thead-tr-th-${uid}-${rowIndex}`
-                  }
                   onFocus={() => handleCellFocus(rowIndex + 1, colIndex)}
                 >
                   <span
