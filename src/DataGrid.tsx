@@ -1,6 +1,12 @@
-import { ReactNode, useId, useRef, KeyboardEvent, useState } from "react";
+import React, {
+  ReactNode,
+  useId,
+  useRef,
+  KeyboardEvent,
+  useState,
+} from "react";
 
-export const DataGrid = ({
+export const Table = ({
   ariaReadOnly = "true",
   ariaRowCount = 0,
   ariaColumnCount = 0,
@@ -24,10 +30,6 @@ export const DataGrid = ({
   const lastFocusedCell = useRef<HTMLElement | null>(null);
   const shiftTabPressedRef = useRef(false); // Flag to detect Shift+Tab
 
-  if (!columns?.length || !data?.length) {
-    return null;
-  }
-
   // Function to get all focusable cells in the table
   const getFocusableCells = (): HTMLElement[] => {
     if (!tableRef.current) return [];
@@ -41,7 +43,7 @@ export const DataGrid = ({
   const focusCell = (row: number, col: number) => {
     const cells = getFocusableCells();
     const totalCols = columns.length;
-    const index = row === 0 ? col : row * totalCols + col;
+    const index = row * totalCols + col;
 
     if (cells[index]) {
       cells[index].focus();
@@ -50,7 +52,7 @@ export const DataGrid = ({
     }
   };
 
-  // Handle keyboard navigation
+  // Handle keyboard navigation on table
   const handleKeyDown = (e: KeyboardEvent<HTMLTableElement>) => {
     // Detect 'Shift+Tab' to set the flag
     if (e.key === "Tab" && e.shiftKey) {
@@ -119,6 +121,25 @@ export const DataGrid = ({
     }
   };
 
+  // Handle keyboard navigation on cell's focusable elements
+  const handleCellKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    const isArrowKey =
+      e.key === "ArrowUp" ||
+      e.key === "ArrowDown" ||
+      e.key === "ArrowLeft" ||
+      e.key === "ArrowRight";
+
+    if (isArrowKey) {
+      // Prevent default behavior
+      e.preventDefault();
+      // Stop propagation to prevent the table's keydown handler from firing
+      e.stopPropagation();
+
+      // Manually trigger the table's keydown handler
+      handleKeyDown(e as unknown as KeyboardEvent<HTMLTableElement>);
+    }
+  };
+
   // Handle table focus
   const handleTableFocus = (e: React.FocusEvent<HTMLTableElement>) => {
     if (e.target === tableRef.current) {
@@ -144,6 +165,22 @@ export const DataGrid = ({
   // Update current focus position when cells are focused
   const handleCellFocus = (row: number, col: number) => {
     setFocusPosition({ row, col });
+  };
+
+  // Function to render cell content with event handlers
+  const renderCellContent = (content: ReactNode) => {
+    return (
+      <div onKeyDown={handleCellKeyDown}>
+        {React.Children.map(content, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, {
+              onKeyDown: handleCellKeyDown,
+            });
+          }
+          return child;
+        })}
+      </div>
+    );
   };
 
   return (
@@ -186,13 +223,9 @@ export const DataGrid = ({
                 aria-labelledby={`table-thead-tr-th-span${uid}-${index}`}
                 tabIndex={-1}
                 onFocus={() => handleCellFocus(0, index)}
+                onKeyDown={handleKeyDown}
               >
-                <span
-                  className="table-header-tr-th-span"
-                  id={`table-thead-tr-th-span${uid}-${index}`}
-                >
-                  {tableHeader}
-                </span>
+                {renderCellContent(tableHeader)}
               </th>
             ))}
           </tr>
@@ -212,27 +245,20 @@ export const DataGrid = ({
                   key={`table-tbody-tr-td-${rowIndex}-${colIndex}`}
                   tabIndex={-1}
                   aria-colindex={colIndex}
-                  // OPTIONALLY USE COMMENTED ITEMS IF COLUMN ONE IS THE ROW HEADER
-                  // scope={colIndex === 0 ? "row" : undefined}
-                  // role={colIndex === 0 ? "rowheader" : "gridcell"}
-                  // aria-readonly={colIndex === 0 ? "true" : undefined}
-                  // aria-labelledby={`table-tbody-tr-td-span-${uid}-${rowIndex}-${colIndex}`}
-                  // aria-describedby={
-                  //   rowIndex !== 0
-                  //     ? `table-thead-tr-th-${uid}-${colIndex} table-tbody-tr-td-${uid}-${rowIndex}-0`
-                  //     : `table-thead-tr-th-${uid}-${colIndex}`
-                  // }
-                  role="gridcell"
+                  scope={colIndex === 0 ? "row" : undefined}
+                  role={colIndex === 0 ? "rowheader" : "gridcell"}
+                  aria-readonly={colIndex === 0 ? "true" : undefined}
                   id={`table-tbody-tr-td-${uid}-${rowIndex}-${colIndex}`}
+                  aria-labelledby={`table-tbody-tr-td-span-${uid}-${rowIndex}-${colIndex}`}
+                  aria-describedby={
+                    rowIndex !== 0
+                      ? `table-thead-tr-th-${uid}-${rowIndex} table-tbody-tr-td-${uid}-${rowIndex}-0`
+                      : `table-thead-tr-th-${uid}-${rowIndex}`
+                  }
                   onFocus={() => handleCellFocus(rowIndex + 1, colIndex)}
+                  onKeyDown={handleKeyDown}
                 >
-                  <span
-                    className="table-body-tr-td-span"
-                    role="presentation"
-                    id={`table-tbody-tr-td-span-${uid}-${rowIndex}-${colIndex}`}
-                  >
-                    {td}
-                  </span>
+                  {renderCellContent(td)}
                 </td>
               ))}
             </tr>

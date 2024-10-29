@@ -1,11 +1,11 @@
 import "./App.css";
-import { DataGrid } from "./DataGrid";
+import { Table } from "./DataGrid";
 
 function App() {
   return (
     <>
       <button>A Focusable Element</button>
-      <DataGrid
+      <Table
         caption="Michael Jordan NBA Stats"
         ariaColumnCount={9}
         ariaReadOnly="true"
@@ -33,7 +33,7 @@ export default App;
 
 const testData = [
   {
-    Year: "2002-03",
+    Year: <button>"2002-03"</button>,
     Team: "Wizards",
     GP: 82,
     Min: 37,
